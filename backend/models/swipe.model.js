@@ -15,6 +15,6 @@ const swipeSchema = mongoose.Schema({
     required: true,
   },
 });
-
+swipeSchema.index({ userId: 1, gameId: 1 }, { unique: true });
 const Swipe = mongoose.model("Swipe", swipeSchema);
 export default Swipe;

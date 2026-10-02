@@ -1,8 +1,9 @@
 import GameCard from "./pages/GameCard";
+import Recommendations from "./pages/Recommendations";
 const App = () => {
   return (
     <div>
-      <GameCard></GameCard>
+      <Recommendations></Recommendations>
     </div>
   );
 };
