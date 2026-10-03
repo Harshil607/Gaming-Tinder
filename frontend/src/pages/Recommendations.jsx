@@ -29,6 +29,8 @@ const Recommendations = () => {
     <h1>Loading</h1>
   ) : error ? (
     <h1>{error}</h1>
+  ) : recommendedGames.length === 0 ? (
+    <h1>There are currently no recommendations</h1>
   ) : (
     <div className="recommendations">
       <ul>{list}</ul>
