@@ -8,7 +8,7 @@ const Recommendations = () => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const loadData = async () => {
-      const reqGames = await getRecommendedGames(123);
+      const reqGames = await getRecommendedGames();
       if (!reqGames.success) {
         setError(reqGames.message);
       }

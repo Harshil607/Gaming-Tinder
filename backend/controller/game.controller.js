@@ -13,7 +13,11 @@ export const getGames = async (req, res) => {
 };
 
 export const postSwipes = async (req, res) => {
-  const swipe = req.body;
+  const swipe = {
+    userId: req.user.userId,
+    gameId: req.body.gameId,
+    action: req.body.action,
+  };
   if (swipe.action !== "like" && swipe.action !== "dislike") {
     return res.status(400).json({ success: false, message: "Invalid swipe" });
   }
@@ -33,12 +37,9 @@ export const postSwipes = async (req, res) => {
 };
 
 export const getSwipes = async (req, res) => {
-  const { userId } = req.params;
-  if (isNaN(Number(userId))) {
-    return res.status(404).json({ success: false, message: "Invalid Id" });
-  }
+  const userId = req.user.userId;
   try {
-    const userSwipes = await Swipe.find({ userId: Number(userId) });
+    const userSwipes = await Swipe.find({ userId });
     res.status(200).json({ success: true, data: userSwipes });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error" });
@@ -46,9 +47,9 @@ export const getSwipes = async (req, res) => {
 };
 
 export const getRecommendations = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.userId;
   try {
-    const swipes = await Swipe.find({ userId: Number(userId) });
+    const swipes = await Swipe.find({ userId });
     const games = await Game.find({});
     const swippedGames = swipes.map((swipe) => {
       const game = games.find((game) => game.externalId === swipe.gameId);
@@ -65,14 +66,18 @@ export const getRecommendations = async (req, res) => {
     }
     const genreScore = {};
     for (const swippedGame of swippedGames) {
+      const weight = swippedGame.game.genres.length;
+      if (weight === 0) {
+        continue;
+      }
       for (const genre of swippedGame.game.genres) {
         if (!(genre in genreScore)) {
           genreScore[genre] = 0;
         }
         if (swippedGame.action === "like") {
-          genreScore[genre]++;
+          genreScore[genre] += 1 / weight;
         } else {
-          genreScore[genre]--;
+          genreScore[genre] -= 1 / weight;
         }
       }
     }
@@ -81,11 +86,12 @@ export const getRecommendations = async (req, res) => {
     );
     const scoredGames = unseenGames.map((ug) => {
       let score = 0;
+      const weight = ug.genres.length;
       for (const genre of ug.genres) {
         if (!(genre in genreScore)) {
           score += 0;
         } else {
-          score += genreScore[genre];
+          score += genreScore[genre] / weight;
         }
       }
       return {
@@ -93,7 +99,7 @@ export const getRecommendations = async (req, res) => {
         score: score,
       };
     });
-    const recommendedGames = scoredGames.filter((sg) => sg.score >= 0);
+    const recommendedGames = scoredGames.filter((sg) => sg.score > 0);
     recommendedGames.sort((a, b) => b.score - a.score);
     res.status(200).json({ success: true, recommendations: recommendedGames });
   } catch (error) {

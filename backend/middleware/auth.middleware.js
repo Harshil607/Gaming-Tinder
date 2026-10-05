@@ -11,7 +11,8 @@ export const protect = async (req, res, next) => {
   const token = splitToken[1];
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return res.status(200).json({ success: true, data: decoded });
+    req.user = decoded;
+    next();
   } catch (error) {
     return res.status(401).json({ success: false, message: "Invalid token" });
   }

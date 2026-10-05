@@ -14,11 +14,13 @@ export const useGameStore = create((set) => ({
     return { success: true, data: data.data };
   },
   recordSwipe: async (swipe) => {
+    const token = localStorage.getItem("token");
     try {
       const res = await fetch("/api/swipes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(swipe),
       });
@@ -31,9 +33,15 @@ export const useGameStore = create((set) => ({
       return { success: false, message: "Couldn't complete the request" };
     }
   },
-  getSwipes: async (userId) => {
+  getSwipes: async () => {
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`/api/swipes/${userId}`);
+      const res = await fetch(`/api/swipes`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       if (!res.ok) {
         return { success: false, message: data.message };
@@ -43,9 +51,15 @@ export const useGameStore = create((set) => ({
       return { success: false, message: "Failed to fetch swipes" };
     }
   },
-  getRecommendedGames: async (userId) => {
+  getRecommendedGames: async () => {
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`/api/recommendations/${userId}`);
+      const res = await fetch(`/api/recommendations`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       if (!res.ok) {
         return { success: false, message: data.message };
