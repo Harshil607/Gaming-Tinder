@@ -33,10 +33,12 @@ export const getGames = async () => {
     },
     body: `fields name, summary, cover.url, genres.name, platforms.name;
     where cover != null;
-    limit 10;`,
+    limit 500;
+    offset 1000;`,
   });
   if (!conn.ok) {
     console.log("Failed to fetch games...");
+    return;
   }
   const data = await conn.json();
   return data;

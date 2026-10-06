@@ -18,10 +18,9 @@ const Recommendations = () => {
   }, []);
   const list = recommendedGames.map((rg) => (
     <li key={rg.game.externalId}>
-      <img src={rg.game.image}></img>
+      <img src={rg.game.image} alt={rg.game.name}></img>
       <h1>{rg.game.name}</h1>
       <h2>{rg.game.genres.join(", ")}</h2>
-      <h2>Score: {rg.score}</h2>
       <p>{rg.game.description}</p>
     </li>
   ));
